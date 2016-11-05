@@ -1,0 +1,2349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<nugget name="ZNEURALNET">
+ <CLAS CLSNAME="ZCL_NN_NEURAL_NETWORK" VERSION="1" LANGU="E" DESCRIPT="Neural Network Class" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" CLSCCINCL="X" FIXPT="X" UNICODE="X" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 ">
+  <localImplementation>*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</localImplementation>
+  <localTypes>*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</localTypes>
+  <localMacros>*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</localMacros>
+  <attribute CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="C_DEFAULT_INITWEIGHT" VERSION="1" LANGU="E" DESCRIPT="Synapses weight" EXPOSURE="2" STATE="1" EDITORDER="5 " ATTDECLTYP="2" ATTVALUE="&apos;1&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_SYN_WEIGHT" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="C_LAYER_HIDDEN" VERSION="1" LANGU="E" DESCRIPT="Single-Character Indicator" EXPOSURE="2" STATE="1" EDITORDER="2 " ATTDECLTYP="2" ATTVALUE="&apos;H&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="CHAR1" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="C_LAYER_OUTPUT" VERSION="1" LANGU="E" DESCRIPT="Single-Character Indicator" EXPOSURE="2" STATE="1" EDITORDER="3 " ATTDECLTYP="2" ATTVALUE="&apos;O&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="CHAR1" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="LAYERS" VERSION="1" LANGU="E" DESCRIPT="Layers table type" EXPOSURE="2" STATE="1" EDITORDER="1 " ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_LAYERS_T" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="LEARNINGRATE" VERSION="1" LANGU="E" DESCRIPT="Learning rate" EXPOSURE="0" STATE="1" EDITORDER="4 " ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_LEARNING_RATE" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <method CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CHANGE_INPUT_VALUES" VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" EDITORDER="3 " DISPID="0 " MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CHANGE_INPUT_VALUES" SCONAME="IT_DENDRITES" VERSION="1" LANGU="E" DESCRIPT="Predecessors table type" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_PREDECESSORS_T"/>
+   <source>METHOD change_input_values.
+
+  DATA ls_layer TYPE znn_layers_s.
+  DATA ls_neurons TYPE znn_neurons_s.
+  DATA ls_dendrites TYPE znn_predecessors_s.
+  DATA ls_dendrites2 TYPE znn_predecessors_s.
+  FIELD-SYMBOLS &lt;fs_dendrites&gt; TYPE znn_predecessors_s.
+
+  LOOP AT it_dendrites ASSIGNING &lt;fs_dendrites&gt;.
+    CLEAR &lt;fs_dendrites&gt;-synapses.
+*    &lt;fs_dendrites&gt;-weight = c_default_initweight.
+  ENDLOOP.
+
+  READ TABLE me-&gt;layers INTO ls_layer WITH KEY layer = 1.
+  LOOP AT ls_layer-neurons INTO ls_neurons.
+    READ TABLE it_dendrites INDEX sy-tabix INTO ls_dendrites.
+    READ TABLE ls_neurons-neuron-&gt;dendrites INDEX sy-tabix INTO ls_dendrites2.
+    MOVE ls_dendrites2-weight TO ls_dendrites-weight.
+    CLEAR ls_neurons-neuron-&gt;dendrites.
+    APPEND ls_dendrites TO ls_neurons-neuron-&gt;dendrites.
+  ENDLOOP.
+
+ENDMETHOD.</source>
+  </method>
+  <method CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" VERSION="1" LANGU="E" DESCRIPT="CONSTRUCTOR" EXPOSURE="2" STATE="1" EDITORDER="1 " DISPID="0 " MTDTYPE="2" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_NUMOFLAYERS" VERSION="1" LANGU="E" DESCRIPT="Number of layers (1-3)" CMPTYPE="1" MTDTYPE="2" EDITORDER="1 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="INT4" PARVALUE="1"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_NUMOFOUTPUTS" VERSION="1" LANGU="E" DESCRIPT="Number of outputs (no. of neurons in the output layer)" CMPTYPE="1" MTDTYPE="2" EDITORDER="2 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="INT4" PARVALUE="1"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_NUMOFINPUTS" VERSION="1" LANGU="E" DESCRIPT="No of neurons in the first layer (no. of inputs)" CMPTYPE="1" MTDTYPE="2" EDITORDER="3 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="INT4" PARVALUE="2"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_NUMOFNODESINH1" VERSION="1" LANGU="E" DESCRIPT="No of neurons in the first hidden layer" CMPTYPE="1" MTDTYPE="2" EDITORDER="4 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="INT4" PAROPTIONL="X"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_NUMOFNODESINH2" VERSION="1" LANGU="E" DESCRIPT="No of neurons in the second hidden layer" CMPTYPE="1" MTDTYPE="2" EDITORDER="5 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="INT4" PAROPTIONL="X"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_LEARNING_RATE" VERSION="1" LANGU="E" DESCRIPT="Learning Rate" CMPTYPE="1" MTDTYPE="2" EDITORDER="6 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_LEARNING_RATE" PARVALUE="&apos;0.1&apos;"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="IP_ACTIVATION_FUNCTION" VERSION="1" LANGU="E" DESCRIPT="Activation function for a perceptron" CMPTYPE="1" MTDTYPE="2" EDITORDER="7 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" PARVALUE="&apos;STEP&apos;"/>
+   <exception CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="CONSTRUCTOR" SCONAME="GENERIC_ERROR" VERSION="1" LANGU="E" MTDTYPE="2" EDITORDER="1 "/>
+   <source>METHOD constructor.
+
+  CONSTANTS c_inputvalue_def TYPE znn_dendrite_value VALUE &apos;0&apos;.
+
+  &quot;Number of layers can&apos;t be GT 3, number of inputs and outputs must be GT 0.
+  IF ip_numoflayers &gt; 3 OR ip_numoflayers &lt; 1 OR ip_numofoutputs &lt; 1.
+    RAISE generic_error.
+  ENDIF.
+  &quot;If you have one layers, the number of inputs is at least one
+  IF ip_numoflayers EQ 1 AND ip_numofinputs &lt; 1.
+    RAISE generic_error.
+  ENDIF.
+  &quot;If you have two layers, the number of inputs is at least 1 and number of neurons in the first hidden layer is at least 1
+  IF ip_numoflayers EQ 2 AND ( ip_numofinputs &lt; 1 OR ip_numofnodesinh1 &lt; 1 ).
+    RAISE generic_error.
+  ENDIF.
+  &quot;If you have three layers, the hidden layers 1, 2 and e should have at least one perceptron, plus at least 1 input
+  IF ip_numoflayers EQ 3 AND ( ip_numofinputs &lt; 1 OR ip_numofnodesinh1 &lt; 1 OR ip_numofnodesinh2 &lt; 1 ).
+    RAISE generic_error.
+  ENDIF.
+
+  me-&gt;learningrate = ip_learning_rate.
+
+  &quot;Start network creation
+  DATA ls_dendrites TYPE znn_predecessors_s.
+  DATA lt_dendrites TYPE znn_predecessors_t.
+  DATA ls_layers TYPE znn_layers_s.
+  DATA ls_neurons TYPE znn_neurons_s.
+  DATA lt_neurons_1 TYPE znn_neurons_t. &quot;neurons in the input layer
+  DATA lt_neurons_2 TYPE znn_neurons_t. &quot;neurons in the first hidden layer
+  DATA lt_neurons_3 TYPE znn_neurons_t. &quot;neurons in the second hidden layer
+  DATA lo_perceptron TYPE REF TO zcl_nn_perceptron.
+
+  CASE ip_numoflayers.
+    WHEN 1.
+
+      &quot;Create input layer
+      CLEAR ls_layers.
+      ls_layers-layer = 1.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_hidden.
+      DO ip_numofinputs TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        ls_dendrites-value = c_inputvalue_def.
+        ls_dendrites-weight = c_default_initweight.
+        APPEND ls_dendrites TO lt_dendrites.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+            ip_threshold       = &apos;0.7&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+        APPEND ls_neurons TO lt_neurons_1. &quot;Old layer neurons to create the next one
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+      &quot;Create output layer
+      CLEAR ls_layers.
+      ls_layers-layer = 2.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_output.
+      DO ip_numofoutputs TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        LOOP AT lt_neurons_1 INTO ls_neurons.
+          ls_dendrites-weight = me-&gt;get_random_weight( ).
+          ls_dendrites-synapses = ls_neurons-neuron.
+          APPEND ls_dendrites TO lt_dendrites.
+        ENDLOOP.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+            ip_threshold       = &apos;0.7&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+    WHEN 2.
+      &quot;Create input layer
+      CLEAR ls_layers.
+      ls_layers-layer = 1.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_hidden.
+      DO ip_numofinputs TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        ls_dendrites-value = c_inputvalue_def.
+        ls_dendrites-weight = c_default_initweight.
+        APPEND ls_dendrites TO lt_dendrites.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;1&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+        APPEND ls_neurons TO lt_neurons_1. &quot;Old layer neurons to create the next one
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+      &quot;Create hidden layer 1
+      CLEAR ls_layers.
+      ls_layers-layer = 2.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_hidden.
+      DO ip_numofnodesinh1 TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        LOOP AT lt_neurons_1 INTO ls_neurons.
+          ls_dendrites-weight = me-&gt;get_random_weight( ).
+          ls_dendrites-synapses = ls_neurons-neuron.
+          APPEND ls_dendrites TO lt_dendrites.
+        ENDLOOP.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;1&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+        APPEND ls_neurons TO lt_neurons_2. &quot;Old layer neurons to create the next one
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+      &quot;Create output layer
+      CLEAR ls_layers.
+      ls_layers-layer = 3.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_output.
+      DO ip_numofoutputs TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        LOOP AT lt_neurons_2 INTO ls_neurons.
+          ls_dendrites-weight = me-&gt;get_random_weight( ).
+          ls_dendrites-synapses = ls_neurons-neuron.
+          APPEND ls_dendrites TO lt_dendrites.
+        ENDLOOP.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;1&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+    WHEN 3.
+      &quot;Create input layer
+      CLEAR ls_layers.
+      ls_layers-layer = 1.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_hidden.
+      DO ip_numofinputs TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        ls_dendrites-value = c_inputvalue_def.
+        ls_dendrites-weight = c_default_initweight.
+        APPEND ls_dendrites TO lt_dendrites.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;0&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+        APPEND ls_neurons TO lt_neurons_1. &quot;Old layer neurons to create the next one
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+      &quot;Create hidden layer 1
+      CLEAR ls_layers.
+      ls_layers-layer = 2.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_hidden.
+      DO ip_numofnodesinh1 TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        LOOP AT lt_neurons_1 INTO ls_neurons.
+          ls_dendrites-weight = me-&gt;get_random_weight( ).
+          ls_dendrites-synapses = ls_neurons-neuron.
+          APPEND ls_dendrites TO lt_dendrites.
+        ENDLOOP.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;0&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+        APPEND ls_neurons TO lt_neurons_2. &quot;Old layer neurons to create the next one
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+      &quot;Create hidden layer 2
+      CLEAR ls_layers.
+      ls_layers-layer = 3.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_hidden.
+      DO ip_numofnodesinh2 TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        LOOP AT lt_neurons_2 INTO ls_neurons.
+          ls_dendrites-weight = me-&gt;get_random_weight( ).
+          ls_dendrites-synapses = ls_neurons-neuron.
+          APPEND ls_dendrites TO lt_dendrites.
+        ENDLOOP.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;0&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+        APPEND ls_neurons TO lt_neurons_3. &quot;Old layer neurons to create the next one
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+
+      &quot;Create output layer
+      CLEAR ls_layers.
+      ls_layers-layer = 4.
+      ls_layers-type = zcl_nn_neural_network=&gt;c_layer_output.
+      DO ip_numofoutputs TIMES.
+        &quot;Initialize inputs
+        CLEAR lt_dendrites.
+        LOOP AT lt_neurons_3 INTO ls_neurons.
+          ls_dendrites-weight = me-&gt;get_random_weight( ).
+          ls_dendrites-synapses = ls_neurons-neuron.
+          APPEND ls_dendrites TO lt_dendrites.
+        ENDLOOP.
+        &quot;Create perceptron
+        CREATE OBJECT lo_perceptron
+          EXPORTING
+            ip_dendrites       = lt_dendrites
+*           ip_threshold       = &apos;0&apos;
+            ip_transf_function = ip_activation_function.
+        &quot;Attach perceptron to layer
+        ls_neurons-neuron = lo_perceptron.
+        APPEND ls_neurons TO ls_layers-neurons.
+      ENDDO.
+      APPEND ls_layers TO me-&gt;layers.
+    WHEN OTHERS.
+  ENDCASE.
+
+ENDMETHOD.</source>
+  </method>
+  <method CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="EXECUTE_TRAINING" VERSION="1" LANGU="E" DESCRIPT="Execute training of network" EXPOSURE="2" STATE="1" EDITORDER="4 " DISPID="0 " MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="EXECUTE_TRAINING" SCONAME="IT_TRAINING_DATA" VERSION="1" LANGU="E" DESCRIPT="Training data structure" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_TRAINING_DATA_T"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="EXECUTE_TRAINING" SCONAME="IP_PRINT_ERROR" VERSION="1" LANGU="E" DESCRIPT="Checkbox" CMPTYPE="1" MTDTYPE="0" EDITORDER="2 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="XFELD" PARVALUE="&apos;X&apos;"/>
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="EXECUTE_TRAINING" SCONAME="RP_ERR" VERSION="1" LANGU="E" DESCRIPT="Axon value" CMPTYPE="1" MTDTYPE="0" EDITORDER="3 " DISPID="0 " PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_AXON_VALUE"/>
+   <source>METHOD execute_training.
+
+  DATA ls_training_data TYPE znn_training_data_s.
+  DATA ls_dendrites TYPE znn_predecessors_s.
+  FIELD-SYMBOLS &lt;fs_dendrites&gt; TYPE znn_predecessors_s.
+  DATA lt_dendrites TYPE znn_predecessors_t.
+  DATA ls_input_values TYPE znn_input_data_s.
+  DATA lt_results TYPE znn_neuralnet_output_t.
+  DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+  DATA ls_expected_results TYPE LINE OF znn_neuralnet_output_t.
+  DATA ls_layer_output TYPE znn_layers_s.
+  DATA ls_layer_hidden TYPE znn_layers_s.
+  DATA ls_layer TYPE znn_layers_s.
+  DATA ls_layer_sup TYPE znn_layers_s.
+  DATA ls_neuron_output TYPE znn_neurons_s.
+  DATA ls_neurons TYPE znn_neurons_s.
+  DATA ls_neurons_sup TYPE znn_neurons_s.
+  DATA lv_output TYPE znn_axon_value.
+  DATA lv_err TYPE znn_axon_value.
+  DATA lv_err_tot TYPE znn_axon_value.
+  DATA lv_i TYPE i VALUE 1.
+  DATA lv_in TYPE znn_axon_value.
+  DATA lv_transf_func TYPE znn_activation_func.
+  DATA lv_deltai TYPE znn_axon_value.
+  DATA lv_delta TYPE znn_axon_value.
+  DATA lt_deltai TYPE STANDARD TABLE OF znn_axon_value.
+  DATA lv_readkey TYPE i.
+  TYPES: BEGIN OF s_delta,
+    layer TYPE int4,
+    delta TYPE STANDARD TABLE OF znn_axon_value WITH DEFAULT KEY,
+    END OF s_delta.
+  DATA ls_delta TYPE s_delta.
+  DATA ls_delta_h TYPE s_delta.
+  DATA lt_delta TYPE STANDARD TABLE OF s_delta.
+  DATA lv_tmp TYPE i.
+
+  LOOP AT it_training_data INTO ls_training_data.
+    &quot;FOR EACH TRAINING CASE
+
+    &quot;1. Change inputs
+    CLEAR lt_dendrites.
+    LOOP AT ls_training_data-input_values INTO ls_input_values.
+      CLEAR ls_dendrites.
+      ls_dendrites-value = ls_input_values-value.
+      APPEND ls_dendrites TO lt_dendrites.
+    ENDLOOP.
+    me-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+    &quot;2. Get result
+    lt_results = me-&gt;get_network_output( ).
+
+    &quot;3. Compare result with training data and calculates delta for output and hidden layers
+    CLEAR lt_deltai.
+    lv_i = 1.
+    LOOP AT ls_training_data-output_values INTO ls_expected_results.
+      &quot;Calculate err
+      READ TABLE lt_results INDEX lv_i INTO ls_results.
+      lv_err = ls_expected_results - ls_results.
+      lv_err_tot = lv_err_tot + sqrt( lv_err * lv_err ).
+      &quot;Calculate lv_in
+      CLEAR lv_in.
+      READ TABLE me-&gt;layers WITH KEY type = zcl_nn_neural_network=&gt;c_layer_output INTO ls_layer_output.
+      READ TABLE ls_layer_output-neurons INDEX lv_i INTO ls_neuron_output.
+      LOOP AT ls_neuron_output-neuron-&gt;dendrites INTO ls_dendrites.
+        lv_in = lv_in + ls_dendrites-synapses-&gt;get_axon_value( ) * ls_dendrites-weight.
+      ENDLOOP.
+      lv_in = lv_in + ls_neuron_output-neuron-&gt;threshold.
+      &quot;Calculate delta i
+      lv_transf_func = ls_neuron_output-neuron-&gt;transf_function.
+      CASE lv_transf_func.
+        WHEN zcl_nn_perceptron=&gt;c_fun_step.
+          lv_deltai = lv_err.
+        WHEN zcl_nn_perceptron=&gt;c_fun_sigmoid. &quot;derivate is (s(x)*(1-s(x)))
+          DATA lv_a TYPE znn_axon_value.
+          COMPUTE lv_a = exp( lv_in ).
+          lv_deltai = ( lv_a / ( ( 1 + lv_a ) * ( 1 + lv_a ) ) ) * lv_err.
+        WHEN zcl_nn_perceptron=&gt;c_fun_identity.
+          lv_deltai = ( 1 / ( cosh( lv_in ) * cosh( lv_in ) ) ) * lv_err.
+        WHEN zcl_nn_perceptron=&gt;c_fun_tanh.
+        WHEN OTHERS.
+          lv_deltai = lv_err.
+      ENDCASE.
+      APPEND lv_deltai TO lt_deltai.
+      ADD 1 TO lv_i.
+    ENDLOOP.
+
+    &quot;Retropropagation of the error
+    CLEAR lt_delta.
+    DATA lt_layers TYPE ZNN_LAYERS_T.
+    lt_layers = me-&gt;layers.
+    SORT lt_layers BY layer DESCENDING.
+    LOOP AT lt_layers INTO ls_layer_hidden WHERE type = zcl_nn_neural_network=&gt;c_layer_hidden. &quot;Retropropagation of the error
+      LOOP AT ls_layer_hidden-neurons INTO ls_neurons. &quot;For each neuron in this layer
+        CLEAR lv_err.
+        CLEAR lv_in.
+        &quot;Recover upper layer
+        lv_readkey = ls_layer_hidden-layer + 1.
+        READ TABLE me-&gt;layers INTO ls_layer_sup WITH KEY layer = lv_readkey.
+        LOOP AT ls_layer_sup-neurons INTO ls_neurons_sup. &quot;For each neuron in the upper layer
+          IF ls_layer_sup-type EQ &apos;O&apos;.
+            READ TABLE lt_deltai INDEX sy-tabix INTO lv_deltai. &quot;Recover deltai associated with this neuron
+          ELSE.
+            lv_tmp = sy-tabix.
+            READ TABLE lt_delta INTO ls_delta_h WITH KEY layer = ls_layer_sup-layer.
+            READ TABLE ls_delta_h-delta INTO lv_deltai INDEX lv_tmp.
+            CLEAR ls_delta_h.
+          ENDIF.
+          LOOP AT ls_neurons_sup-neuron-&gt;dendrites INTO ls_dendrites.
+            IF ls_dendrites-synapses EQ ls_neurons-neuron.
+              &quot;Take all the connections with superior layer and calculate err
+              lv_err = lv_err + ls_dendrites-weight * lv_deltai.
+            ENDIF.
+          ENDLOOP.
+        ENDLOOP.
+        &quot;Calculate the delta
+        LOOP AT ls_neurons-neuron-&gt;dendrites INTO ls_dendrites.
+          IF ls_dendrites-value IS INITIAL AND ls_dendrites-synapses IS BOUND.
+            lv_in = lv_in + ls_dendrites-synapses-&gt;get_axon_value( ) * ls_dendrites-weight.
+          ELSE.
+            lv_in = lv_in + ls_dendrites-value * ls_dendrites-weight.
+          ENDIF.
+        ENDLOOP.
+        lv_in = lv_in + ls_neurons-neuron-&gt;threshold.
+        lv_transf_func = ls_neurons-neuron-&gt;transf_function.
+        CASE lv_transf_func.
+          WHEN zcl_nn_perceptron=&gt;c_fun_step.
+            lv_delta = lv_err.
+          WHEN zcl_nn_perceptron=&gt;c_fun_sigmoid. &quot;derivate is (s(x)*(1-s(x)))
+            COMPUTE lv_a = exp( lv_in ).
+            lv_delta = ( lv_a / ( ( 1 + lv_a ) * ( 1 + lv_a ) ) ) * lv_err.
+          WHEN zcl_nn_perceptron=&gt;c_fun_identity.
+            lv_delta = lv_err.
+          WHEN zcl_nn_perceptron=&gt;c_fun_tanh.
+            lv_delta = ( 1 / ( cosh( lv_in ) * cosh( lv_in ) ) ) * lv_err.
+          WHEN OTHERS.
+            lv_delta = lv_err.
+        ENDCASE.
+        APPEND lv_delta TO ls_delta-delta.
+      ENDLOOP.
+      ls_delta-layer = ls_layer_hidden-layer.
+      APPEND ls_delta TO lt_delta.
+      CLEAR ls_delta.
+    ENDLOOP.
+
+    &quot;4. Update weights
+    LOOP AT lt_layers INTO ls_layer.
+      IF ls_layer-type EQ zcl_nn_neural_network=&gt;c_layer_output. &quot;Update output layer weights
+        LOOP AT ls_layer-neurons INTO ls_neurons.
+          READ TABLE lt_deltai INTO lv_deltai INDEX sy-tabix.
+          LOOP AT ls_neurons-neuron-&gt;dendrites ASSIGNING &lt;fs_dendrites&gt;.
+            &lt;fs_dendrites&gt;-weight = &lt;fs_dendrites&gt;-weight + me-&gt;learningrate * &lt;fs_dendrites&gt;-synapses-&gt;get_axon_value( ) * lv_deltai.
+          ENDLOOP.
+        ENDLOOP.
+      ELSEIF ls_layer-type EQ zcl_nn_neural_network=&gt;c_layer_hidden. &quot;Update hidden layer weights
+        READ TABLE lt_delta INTO ls_delta_h WITH KEY layer = ls_layer-layer.
+        LOOP AT ls_layer-neurons INTO ls_neurons.
+          READ TABLE ls_delta_h-delta INTO lv_delta INDEX sy-tabix.
+          LOOP AT ls_neurons-neuron-&gt;dendrites ASSIGNING &lt;fs_dendrites&gt;.
+            IF &lt;fs_dendrites&gt;-synapses IS BOUND.
+              &lt;fs_dendrites&gt;-weight = &lt;fs_dendrites&gt;-weight + me-&gt;learningrate * &lt;fs_dendrites&gt;-synapses-&gt;get_axon_value( ) * lv_delta.
+            ELSE. &quot;Is an intial value
+*              &lt;fs_dendrites&gt;-weight = &lt;fs_dendrites&gt;-weight + me-&gt;learningrate * &lt;fs_dendrites&gt;-value * lv_delta.
+            ENDIF.
+          ENDLOOP.
+        ENDLOOP.
+      ENDIF.
+    ENDLOOP.
+
+  ENDLOOP.
+
+  IF ip_print_error EQ abap_true.
+    WRITE: / &apos;Error: &apos;, lv_err_tot.
+  ENDIF.
+
+ENDMETHOD.</source>
+  </method>
+  <method CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="GET_NETWORK_OUTPUT" VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" EDITORDER="2 " DISPID="0 " MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="GET_NETWORK_OUTPUT" SCONAME="RT_NEURALNET_OUTPUT" VERSION="1" LANGU="E" DESCRIPT="Axon value" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_NEURALNET_OUTPUT_T"/>
+   <source>METHOD get_network_output.
+
+  DATA ls_layer_output TYPE znn_layers_s.
+  DATA ls_neuron_output TYPE znn_neurons_s.
+  DATA lv_output TYPE znn_axon_value.
+
+  &quot;Read output layer
+  READ TABLE me-&gt;layers WITH KEY type = zcl_nn_neural_network=&gt;c_layer_output INTO ls_layer_output.
+  &quot;Read output neuron number 1
+  LOOP AT ls_layer_output-neurons INTO ls_neuron_output.
+    lv_output = ls_neuron_output-neuron-&gt;get_axon_value( ).
+    APPEND lv_output TO rt_neuralnet_output.
+  ENDLOOP.
+
+ENDMETHOD.</source>
+  </method>
+  <method CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="GET_RANDOM_WEIGHT" VERSION="1" LANGU="E" EXPOSURE="0" STATE="1" EDITORDER="5 " DISPID="0 " MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_NEURAL_NETWORK" CMPNAME="GET_RANDOM_WEIGHT" SCONAME="RP_WEIGHT" VERSION="1" LANGU="E" DESCRIPT="Synapses weight" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_SYN_WEIGHT"/>
+   <source>METHOD get_random_weight.
+
+  DATA lv_weight TYPE i.
+  DATA lv_sign TYPE i.
+  DATA lv_weightc TYPE string.
+  DATA lv_weight_rec TYPE string.
+  DATA lv_weight_re TYPE znn_syn_weight.
+
+  CALL FUNCTION &apos;QF05_RANDOM_INTEGER&apos;
+    EXPORTING
+      ran_int_max   = 9
+      ran_int_min   = 1
+    IMPORTING
+      ran_int       = lv_weight
+    EXCEPTIONS
+      invalid_input = 1
+      OTHERS        = 2.
+  IF sy-subrc &lt;&gt; 0.
+* Implement suitable error handling here
+  ENDIF.
+   CALL FUNCTION &apos;QF05_RANDOM_INTEGER&apos;
+    EXPORTING
+      ran_int_max   = 1
+      ran_int_min   = 0
+    IMPORTING
+      ran_int       = lv_sign
+    EXCEPTIONS
+      invalid_input = 1
+      OTHERS        = 2.
+  IF sy-subrc &lt;&gt; 0.
+* Implement suitable error handling here
+  ENDIF.
+  lv_weightc = lv_weight.
+  IF lv_sign EQ 0.
+    CONCATENATE &apos;0.&apos; lv_weightc INTO lv_weight_rec.
+  ELSE.
+    CONCATENATE &apos;-0.&apos; lv_weightc INTO lv_weight_rec.
+  ENDIF.
+  rp_weight = lv_weight_rec.
+
+ENDMETHOD.</source>
+  </method>
+ </CLAS>
+ <CLAS CLSNAME="ZCL_NN_PERCEPTRON" VERSION="1" LANGU="E" DESCRIPT="Simple perceptron" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" CLSCCINCL="X" FIXPT="X" UNICODE="X" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 ">
+  <localImplementation>*&quot;* use this source file for the definition and implementation of
+*&quot;* local helper classes, interface definitions and type
+*&quot;* declarations</localImplementation>
+  <localTypes>*&quot;* use this source file for any type of declarations (class
+*&quot;* definitions, interfaces or type declarations) you need for
+*&quot;* components in the private section</localTypes>
+  <localMacros>*&quot;* use this source file for any macro definitions you need
+*&quot;* in the implementation part of the class</localMacros>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="C_FUN_IDENTITY" VERSION="1" LANGU="E" DESCRIPT="Activation function for a perceptron" EXPOSURE="2" STATE="1" EDITORDER="6 " ATTDECLTYP="2" ATTVALUE="&apos;IDENTITY&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="C_FUN_SIGMOID" VERSION="1" LANGU="E" DESCRIPT="Activation function for a perceptron" EXPOSURE="2" STATE="1" EDITORDER="5 " ATTDECLTYP="2" ATTVALUE="&apos;SIGMOID&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="C_FUN_STEP" VERSION="1" LANGU="E" DESCRIPT="Activation function for a perceptron" EXPOSURE="2" STATE="1" EDITORDER="4 " ATTDECLTYP="2" ATTVALUE="&apos;STEP&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="C_FUN_TANH" VERSION="1" LANGU="E" DESCRIPT="Activation function for a perceptron" EXPOSURE="2" STATE="1" EDITORDER="7 " ATTDECLTYP="2" ATTVALUE="&apos;TANH&apos;" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="DENDRITES" VERSION="1" LANGU="E" DESCRIPT="Predecessors table type" EXPOSURE="2" STATE="1" EDITORDER="1 " ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_PREDECESSORS_T" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="THRESHOLD" VERSION="1" LANGU="E" DESCRIPT="Threshold value" EXPOSURE="2" STATE="1" EDITORDER="2 " ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_AXON_VALUE" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <attribute CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="TRANSF_FUNCTION" VERSION="1" LANGU="E" DESCRIPT="Activation function for a perceptron" EXPOSURE="2" STATE="1" EDITORDER="3 " ATTDECLTYP="0" ATTEXPVIRT="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " TYPESRC_LENG="0 "/>
+  <method CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="CONSTRUCTOR" VERSION="1" LANGU="E" DESCRIPT="CONSTRUCTOR" EXPOSURE="2" STATE="1" EDITORDER="1 " DISPID="0 " MTDTYPE="2" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="CONSTRUCTOR" SCONAME="IP_DENDRITES" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="2" EDITORDER="1 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_PREDECESSORS_T"/>
+   <parameter CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="CONSTRUCTOR" SCONAME="IP_THRESHOLD" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="2" EDITORDER="2 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_AXON_VALUE" PARVALUE="&apos;0&apos;"/>
+   <parameter CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="CONSTRUCTOR" SCONAME="IP_TRANSF_FUNCTION" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="2" EDITORDER="3 " DISPID="0 " PARDECLTYP="0" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_ACTIVATION_FUNC" PARVALUE="&apos;SIGMOID&apos;"/>
+   <source>METHOD constructor.
+
+  me-&gt;transf_function = ip_transf_function.
+  me-&gt;threshold = ip_threshold.
+  me-&gt;dendrites = ip_dendrites.
+
+ENDMETHOD.</source>
+  </method>
+  <method CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="GET_AXON_VALUE" VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" EDITORDER="2 " DISPID="0 " MTDTYPE="0" MTDDECLTYP="0" BCMTDCAT="00" BCMTDSYN="0">
+   <parameter CLSNAME="ZCL_NN_PERCEPTRON" CMPNAME="GET_AXON_VALUE" SCONAME="RT_AXON_VALUE" VERSION="1" LANGU="E" DESCRIPT="Axon value" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " PARDECLTYP="3" PARPASSTYP="0" TYPTYPE="1" TYPE="ZNN_AXON_VALUE"/>
+   <source>METHOD get_axon_value.
+
+  DATA ls_dendrites TYPE znn_predecessors_s.
+  DATA lv_soma TYPE znn_axon_value.
+  DATA lv_is_input TYPE xfeld.
+  LOOP AT me-&gt;dendrites INTO ls_dendrites.
+    IF ls_dendrites-value IS INITIAL AND ls_dendrites-synapses IS BOUND.
+      &quot;is not an input
+      lv_soma = lv_soma + ls_dendrites-synapses-&gt;get_axon_value( ) * ls_dendrites-weight.
+    ELSE.
+      &quot;is an input
+      lv_soma = lv_soma + ls_dendrites-value * ls_dendrites-weight.
+      lv_is_input = abap_true.
+    ENDIF.
+  ENDLOOP.
+  lv_soma = lv_soma - me-&gt;threshold.
+
+  IF lv_is_input = abap_true.
+    rt_axon_value = lv_soma.
+    RETURN.
+  ENDIF.
+
+  CASE me-&gt;transf_function.
+    WHEN c_fun_sigmoid. &quot;S(t)=1/(1+e^-t)
+      DATA lv_e TYPE znn_axon_value.
+      COMPUTE lv_e = ( 1 + ( exp( - lv_soma ) ) ).
+      rt_axon_value = ( 1 / lv_e ).&quot; - ( 1 / 2 ).
+    WHEN c_fun_identity. &quot;S(t)=t
+      rt_axon_value = lv_soma.
+    WHEN c_fun_step. &quot;Step function (1 if t&gt;=0, 0 if t&lt;0)
+      IF lv_soma GT 0.
+        rt_axon_value = 1.
+      ELSE.
+        rt_axon_value = 0.
+      ENDIF.
+    WHEN c_fun_tanh. &quot;S(t)=2/(1+e^{-2t})-1 or S(t)=1-2/(e^{2t}+1)
+      rt_axon_value = tanh( lv_soma ).
+    WHEN OTHERS.
+      IF lv_soma &lt; 0.
+        rt_axon_value = 0.
+      ELSEIF lv_soma &gt; 1.
+        rt_axon_value = 1.
+      ELSE.
+        rt_axon_value = lv_soma.
+      ENDIF.
+  ENDCASE.
+
+ENDMETHOD.</source>
+  </method>
+ </CLAS>
+ <DOMA DOMNAME="ZNN_ACTIVATION_FUNC" MultiLanguageSupport="X">
+  <DDLANGUAGE LANGU="E">
+   <DD01V DOMNAME="ZNN_ACTIVATION_FUNC" DDLANGUAGE="E" DATATYPE="CHAR" LENG="000010" OUTPUTLEN="000010" DECIMALS="000000" VALEXI="X" MASKLEN="0000" DDTEXT="Activation function for a perceptron" AUTHCLASS="00" OUTPUTSTYLE="00"/>
+   <DD07V DOMNAME="ZNN_ACTIVATION_FUNC" VALPOS="0001" DDLANGUAGE="E" DOMVALUE_L="STEP" DDTEXT="Step function (1 if t&gt;=0, 0 if t&lt;0)"/>
+   <DD07V DOMNAME="ZNN_ACTIVATION_FUNC" VALPOS="0002" DDLANGUAGE="E" DOMVALUE_L="SIGMOID" DDTEXT="S(t)=1/(1+e^-t)"/>
+   <DD07V DOMNAME="ZNN_ACTIVATION_FUNC" VALPOS="0003" DDLANGUAGE="E" DOMVALUE_L="IDENTITY" DDTEXT="S(t)=t"/>
+   <DD07V DOMNAME="ZNN_ACTIVATION_FUNC" VALPOS="0004" DDLANGUAGE="E" DOMVALUE_L="TANH" DDTEXT="S(t)=2/(1+e^{-2t})-1 or S(t)=1-2/(e^{2t}+1)"/>
+  </DDLANGUAGE>
+ </DOMA>
+ <DTEL ROLLNAME="ZNN_AXON_VALUE" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Axon value" REPTEXT="Axon value" SCRTEXT_S="Axon value" SCRTEXT_M="Axon value" SCRTEXT_L="Axon value" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000031" DECIMALS="000010" OUTPUTLEN="000038" MultiLanguageSupport="X">
+  <tpara/>
+  <DDLANGUAGE LANGU="E">
+   <DD04V ROLLNAME="ZNN_AXON_VALUE" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Axon value" REPTEXT="Axon value" SCRTEXT_S="Axon value" SCRTEXT_M="Axon value" SCRTEXT_L="Axon value" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000031" DECIMALS="000010" OUTPUTLEN="000038"/>
+  </DDLANGUAGE>
+ </DTEL>
+ <DTEL ROLLNAME="ZNN_DENDRITE_VALUE" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="14" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Dendrite value" REPTEXT="Dendrite value" SCRTEXT_S="Dendrite" SCRTEXT_M="Dendrite value" SCRTEXT_L="Dendrite value" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000006" DECIMALS="000003" OUTPUTLEN="000007" MultiLanguageSupport="X">
+  <tpara/>
+  <DDLANGUAGE LANGU="E">
+   <DD04V ROLLNAME="ZNN_DENDRITE_VALUE" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="14" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Dendrite value" REPTEXT="Dendrite value" SCRTEXT_S="Dendrite" SCRTEXT_M="Dendrite value" SCRTEXT_L="Dendrite value" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000006" DECIMALS="000003" OUTPUTLEN="000007"/>
+  </DDLANGUAGE>
+ </DTEL>
+ <DTEL ROLLNAME="ZNN_LEARNING_RATE" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Learning rate" REPTEXT="Learning rate" SCRTEXT_S="Learn rate" SCRTEXT_M="Learning rate" SCRTEXT_L="Learning rate" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000015" DECIMALS="000010" OUTPUTLEN="000017" MultiLanguageSupport="X">
+  <tpara/>
+  <DDLANGUAGE LANGU="E">
+   <DD04V ROLLNAME="ZNN_LEARNING_RATE" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Learning rate" REPTEXT="Learning rate" SCRTEXT_S="Learn rate" SCRTEXT_M="Learning rate" SCRTEXT_L="Learning rate" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000015" DECIMALS="000010" OUTPUTLEN="000017"/>
+  </DDLANGUAGE>
+ </DTEL>
+ <DTEL ROLLNAME="ZNN_ACTIVATION_FUNC" DDLANGUAGE="E" DOMNAME="ZNN_ACTIVATION_FUNC" ROUTPUTLEN="000000" HEADLEN="36" SCRLEN1="10" SCRLEN2="19" SCRLEN3="20" DDTEXT="Activation function for a perceptron" REPTEXT="Activation function for a perceptron" SCRTEXT_S="Act. func." SCRTEXT_M="Activation function" SCRTEXT_L="Activation function" AUTHCLASS="00" DTELMASTER="E" DATATYPE="CHAR" LENG="000010" DECIMALS="000000" OUTPUTLEN="000010" VALEXI="X" REFKIND="D" MultiLanguageSupport="X">
+  <tpara/>
+  <DDLANGUAGE LANGU="E">
+   <DD04V ROLLNAME="ZNN_ACTIVATION_FUNC" DDLANGUAGE="E" DOMNAME="ZNN_ACTIVATION_FUNC" ROUTPUTLEN="000000" HEADLEN="36" SCRLEN1="10" SCRLEN2="19" SCRLEN3="20" DDTEXT="Activation function for a perceptron" REPTEXT="Activation function for a perceptron" SCRTEXT_S="Act. func." SCRTEXT_M="Activation function" SCRTEXT_L="Activation function" AUTHCLASS="00" DTELMASTER="E" DATATYPE="CHAR" LENG="000010" DECIMALS="000000" OUTPUTLEN="000010" VALEXI="X" REFKIND="D"/>
+  </DDLANGUAGE>
+ </DTEL>
+ <DTEL ROLLNAME="ZNN_SYN_WEIGHT" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Synapses weight" REPTEXT="Synapses weight" SCRTEXT_S="Syn weight" SCRTEXT_M="Synapses weight" SCRTEXT_L="Synapses weight" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000031" DECIMALS="000010" OUTPUTLEN="000038" MultiLanguageSupport="X">
+  <tpara/>
+  <DDLANGUAGE LANGU="E">
+   <DD04V ROLLNAME="ZNN_SYN_WEIGHT" DDLANGUAGE="E" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DDTEXT="Synapses weight" REPTEXT="Synapses weight" SCRTEXT_S="Syn weight" SCRTEXT_M="Synapses weight" SCRTEXT_L="Synapses weight" AUTHCLASS="00" DTELMASTER="E" DATATYPE="DEC" LENG="000031" DECIMALS="000010" OUTPUTLEN="000038"/>
+  </DDLANGUAGE>
+ </DTEL>
+ <PROG NAME="ZNN_TEST_2_LAYERS_NETWORK_X2" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - X2" LENGTH="42 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_FX
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_network_x2.
+
+*http://www.tesionline.it/v2/appunto-sub.jsp?p=61&amp;id=223
+*http://www.tesionline.it/v2/appunto-sub.jsp?p=60&amp;id=223
+*
+*0-10           x^2 -&gt; 100
+*
+*0.1            0.01
+*0.2            0.04
+*0.3            0.09
+*0.4            0.16
+*0.5            0.25
+*0.6            0.36
+*0.7            0.49
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 1    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 20    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      = 10   &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;1&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_sigmoid    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;0.1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.01&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.2&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.04&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.3&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.09&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.4&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.16&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.5&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.25&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.6&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.32&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.7&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.49&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+DO 6000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.2&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.2: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.5&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.5: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.6&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.6: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.7&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.7: (x)&apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.8&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.8: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.9&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.9: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_NETWORK_EXP" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - EXP" LENGTH="42 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_FX
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_network_exp.
+
+*http://www.tesionline.it/v2/appunto-sub.jsp?p=61&amp;id=223
+*http://www.tesionline.it/v2/appunto-sub.jsp?p=60&amp;id=223
+*
+*0-10           2^x -&gt; 1000
+*
+*0.1            0.01
+*0.2            0.02
+*0.3            0.04
+*0.4            0.08
+*0.5            0.16
+*0.6            0.32
+*0.7            0.64
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 1    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 40    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      = 10   &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;6&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_sigmoid    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;0.01&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.002&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.02&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.004&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.03&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.008&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.04&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.016&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.05&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.032&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.06&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.064&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.07&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.128&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.08&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.256&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+*
+*ls_input_data-value = &apos;0.09&apos;.
+*APPEND ls_input_data TO ls_training_data-input_values.
+*APPEND &apos;0.512&apos; TO ls_training_data-output_values.
+*APPEND ls_training_data TO lt_training_data.
+*CLEAR ls_training_data.
+
+DO 4000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.01&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.01: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.02&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.02: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.05&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.05: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.06&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.06: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.07&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.07: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.08&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.08: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.09&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.09 x: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.2&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.2: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_X_SIGMOID" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - X - Sigmoid" LENGTH="44 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_AND
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_x_sigmoid.
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 1    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 6    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      =     &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;2&apos;    &quot; Learning Rate
+    ip_activation_function = &apos;SIGMOID&apos;    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;0.1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.2&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.2&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.3&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.3&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+
+DO 3000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.2&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.2: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.7&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.7: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_AND_STEP" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - LOGIC AND - Step" LENGTH="49 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_AND
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_and_step.
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 2    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 15    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      = 15    &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;0.1&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_step    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with default values: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+DO 100 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/1: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_AND_SIGMOID" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - LOGIC AND - Sigmoid" LENGTH="52 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_AND
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_and_sigmoid.
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 2    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 15    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      =     &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;2&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_sigmoid    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with default values: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+DO 100 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/1: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_NETWORK_OR" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - LOGIC OR" LENGTH="41 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_AND
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_network_or.
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 2    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 3    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      =     &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;0.1&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_step    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with default values: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+DO 3000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/1: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_1_LAYER_NETWORK_AND" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test one layer neural network (single perceptron) - LOGIC AND" LENGTH="61 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_1_LAYERS_NETWORK_AND
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_1_layer_network_and. &quot;Single perceptron
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 1    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 2    &quot; No of neurons in the first layer (no. of inputs)
+*    ip_numofnodesinh1      =     &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      =     &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;0.1&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_step    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with default values: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+DO 2000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/1: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_NETWORK_XOR" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - LOGIC XOR" LENGTH="42 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_XOR
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_network_xor.
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 2    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 3    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      =     &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;0.1&apos;    &quot; Learning Rate
+    ip_activation_function = zcl_nn_perceptron=&gt;c_fun_step    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with default values: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 0/0: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result with changed input 1/1: &apos;, ls_results.
+ENDLOOP.
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;0&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+ls_input_data-value = &apos;1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+DO 3000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;0&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0/0: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+ls_dendrites-value = &apos;1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 1/1: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <PROG NAME="ZNN_TEST_2_LAYERS_X_RAMP" VARCL="X" SUBC="1" RMAND="800" RLOAD="E" FIXPT="X" UCCHECK="X">
+  <textPool>
+   <language SPRAS="E">
+    <textElement ID="R" ENTRY="Test two layers neural network - X - Ramp" LENGTH="43 "/>
+   </language>
+  </textPool>
+  <source>*&amp;---------------------------------------------------------------------*
+*&amp; Report  ZNN_TEST_2_LAYERS_NETWORK_AND
+*&amp;
+*&amp;---------------------------------------------------------------------*
+*&amp;
+*&amp;
+*&amp;---------------------------------------------------------------------*
+
+REPORT znn_test_2_layers_x_ramp.
+
+DATA lo_neural_network TYPE REF TO zcl_nn_neural_network.
+DATA ls_layer_output TYPE znn_layers_s.
+DATA ls_neuron_output TYPE znn_neurons_s.
+DATA lt_results TYPE znn_neuralnet_output_t.
+DATA ls_results TYPE LINE OF znn_neuralnet_output_t.
+DATA ls_dendrites TYPE znn_predecessors_s.
+DATA lt_dendrites TYPE znn_predecessors_t.
+
+CREATE OBJECT lo_neural_network
+  EXPORTING
+    ip_numoflayers         = 2    &quot; Number of layers (1-3)
+    ip_numofoutputs        = 1    &quot; Number of outputs (no. of neurons in the output layer)
+    ip_numofinputs         = 1    &quot; No of neurons in the first layer (no. of inputs)
+    ip_numofnodesinh1      = 6    &quot; No of neurons in the first hidden layer
+*    ip_numofnodesinh2      =     &quot; No of neurons in the second hidden layer
+    ip_learning_rate       = &apos;0.5&apos;    &quot; Learning Rate
+    ip_activation_function = &apos;0..1&apos;    &quot; Activation function for a perceptron
+  EXCEPTIONS
+    generic_error     = 1
+    OTHERS            = 2.
+IF sy-subrc &lt;&gt; 0.
+  MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+             WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+ENDIF.
+
+
+&quot;Train the network
+DATA lt_training_data TYPE znn_training_data_t.
+DATA ls_training_data TYPE znn_training_data_s.
+DATA ls_input_data TYPE znn_input_data_s.
+
+ls_input_data-value = &apos;0.1&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.1&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.2&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.2&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+ls_input_data-value = &apos;0.3&apos;.
+APPEND ls_input_data TO ls_training_data-input_values.
+APPEND &apos;0.3&apos; TO ls_training_data-output_values.
+APPEND ls_training_data TO lt_training_data.
+CLEAR ls_training_data.
+
+
+DO 3000 TIMES.
+lo_neural_network-&gt;execute_training( it_training_data = lt_training_data ).
+ENDDO.
+
+
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.1&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.1: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.2&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.2: &apos;,ls_results.
+ENDLOOP.
+
+&quot;Change inputs
+CLEAR lt_dendrites.
+ls_dendrites-value = &apos;0.7&apos;.
+APPEND ls_dendrites TO lt_dendrites.
+lo_neural_network-&gt;change_input_values( it_dendrites = lt_dendrites ).
+
+&quot;Get results
+lt_results = lo_neural_network-&gt;get_network_output( ).
+LOOP AT lt_results INTO ls_results.
+  WRITE: / &apos;Result after training with input 0.7: &apos;,ls_results.
+ENDLOOP.</source>
+ </PROG>
+ <TABL TABNAME="ZNN_PREDECESSORS_S" DDLANGUAGE="E" TABCLASS="INTTAB" DATMIN="0000000000" DATMAX="0000000000" DATAVG="0000000000" DDTEXT="Predecessors structure (fixed input value or synapses)" AUTHCLASS="00" PROZPUFF="000" EXCLASS="0">
+  <dd09l AS4VERS="0000" SCHFELDANZ="000"/>
+  <dd03p TABNAME="ZNN_PREDECESSORS_S" FIELDNAME="VALUE" DDLANGUAGE="E" POSITION="0001" ROLLNAME="ZNN_DENDRITE_VALUE" ADMINFIELD="0" INTTYPE="P" INTLEN="000004" ROUTPUTLEN="000000" HEADLEN="14" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DTELMASTER="E" DATATYPE="DEC" LENG="000006" OUTPUTLEN="000007" DECIMALS="000003" MASK="  DEC E" MASKLEN="0000" DDTEXT="Dendrite value" REPTEXT="Dendrite value" SCRTEXT_S="Dendrite" SCRTEXT_M="Dendrite value" SCRTEXT_L="Dendrite value" DEPTH="00" COMPTYPE="E" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+  <dd03p TABNAME="ZNN_PREDECESSORS_S" FIELDNAME="SYNAPSES" DDLANGUAGE="E" POSITION="0002" ROLLNAME="ZCL_NN_PERCEPTRON" ADMINFIELD="0" INTLEN="000000" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="00" SCRLEN2="00" SCRLEN3="00" DATATYPE="REF" LENG="000000" OUTPUTLEN="000000" DECIMALS="000000" MASK="  REF RC" MASKLEN="0000" DDTEXT="Simple perceptron" DEPTH="00" COMPTYPE="R" REFTYPE="C" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+  <dd03p TABNAME="ZNN_PREDECESSORS_S" FIELDNAME="WEIGHT" DDLANGUAGE="E" POSITION="0003" ROLLNAME="ZNN_SYN_WEIGHT" ADMINFIELD="0" INTTYPE="P" INTLEN="000016" ROUTPUTLEN="000000" HEADLEN="15" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DTELMASTER="E" DATATYPE="DEC" LENG="000031" OUTPUTLEN="000038" DECIMALS="000010" MASK="  DEC E" MASKLEN="0000" DDTEXT="Synapses weight" REPTEXT="Synapses weight" SCRTEXT_S="Syn weight" SCRTEXT_M="Synapses weight" SCRTEXT_L="Synapses weight" DEPTH="00" COMPTYPE="E" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+ </TABL>
+ <TABL TABNAME="ZNN_TRAINING_DATA_S" DDLANGUAGE="E" TABCLASS="INTTAB" DATMIN="0000000000" DATMAX="0000000000" DATAVG="0000000000" DDTEXT="Training data structure" AUTHCLASS="00" PROZPUFF="000" EXCLASS="0">
+  <dd09l AS4VERS="0000" SCHFELDANZ="000"/>
+  <dd03p TABNAME="ZNN_TRAINING_DATA_S" FIELDNAME="INPUT_VALUES" DDLANGUAGE="E" POSITION="0001" ROLLNAME="ZNN_INPUT_DATA_T" ADMINFIELD="0" INTLEN="000000" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="00" SCRLEN2="00" SCRLEN3="00" DATATYPE="TTYP" LENG="000000" OUTPUTLEN="000000" DECIMALS="000000" MASK="  TTYPL" MASKLEN="0000" DDTEXT="Input data for training" DEPTH="00" COMPTYPE="L" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+  <dd03p TABNAME="ZNN_TRAINING_DATA_S" FIELDNAME="OUTPUT_VALUES" DDLANGUAGE="E" POSITION="0002" ROLLNAME="ZNN_NEURALNET_OUTPUT_T" ADMINFIELD="0" INTLEN="000000" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="00" SCRLEN2="00" SCRLEN3="00" DATATYPE="TTYP" LENG="000000" OUTPUTLEN="000000" DECIMALS="000000" MASK="  TTYPL" MASKLEN="0000" DDTEXT="Neural Network Output" DEPTH="00" COMPTYPE="L" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+ </TABL>
+ <TABL TABNAME="ZNN_NEURONS_S" DDLANGUAGE="E" TABCLASS="INTTAB" DATMIN="0000000000" DATMAX="0000000000" DATAVG="0000000000" DDTEXT="Neurons structure for a layer" AUTHCLASS="00" PROZPUFF="000" EXCLASS="0">
+  <dd09l AS4VERS="0000" SCHFELDANZ="000"/>
+  <dd03p TABNAME="ZNN_NEURONS_S" FIELDNAME="NEURON" DDLANGUAGE="E" POSITION="0001" ROLLNAME="ZCL_NN_PERCEPTRON" ADMINFIELD="0" INTLEN="000000" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="00" SCRLEN2="00" SCRLEN3="00" DATATYPE="REF" LENG="000000" OUTPUTLEN="000000" DECIMALS="000000" MASK="  REF RC" MASKLEN="0000" DDTEXT="Simple perceptron" DEPTH="00" COMPTYPE="R" REFTYPE="C" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+ </TABL>
+ <TABL TABNAME="ZNN_INPUT_DATA_S" DDLANGUAGE="E" TABCLASS="INTTAB" DATMIN="0000000000" DATMAX="0000000000" DATAVG="0000000000" DDTEXT="input data structure for training" AUTHCLASS="00" PROZPUFF="000" EXCLASS="0">
+  <dd09l AS4VERS="0000" SCHFELDANZ="000"/>
+  <dd03p TABNAME="ZNN_INPUT_DATA_S" FIELDNAME="VALUE" DDLANGUAGE="E" POSITION="0001" ROLLNAME="ZNN_DENDRITE_VALUE" ADMINFIELD="0" INTTYPE="P" INTLEN="000004" ROUTPUTLEN="000000" HEADLEN="14" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DTELMASTER="E" DATATYPE="DEC" LENG="000006" OUTPUTLEN="000007" DECIMALS="000003" MASK="  DEC E" MASKLEN="0000" DDTEXT="Dendrite value" REPTEXT="Dendrite value" SCRTEXT_S="Dendrite" SCRTEXT_M="Dendrite value" SCRTEXT_L="Dendrite value" DEPTH="00" COMPTYPE="E" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+ </TABL>
+ <TABL TABNAME="ZNN_LAYERS_S" DDLANGUAGE="E" TABCLASS="INTTAB" DATMIN="0000000000" DATMAX="0000000000" DATAVG="0000000000" DDTEXT="Layer structure" AUTHCLASS="00" PROZPUFF="000" EXCLASS="0">
+  <dd09l AS4VERS="0000" SCHFELDANZ="000"/>
+  <dd03p TABNAME="ZNN_LAYERS_S" FIELDNAME="LAYER" DDLANGUAGE="E" POSITION="0001" ROLLNAME="INT4" ADMINFIELD="0" INTTYPE="X" INTLEN="000004" DOMNAME="INT4" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="10" SCRLEN2="15" SCRLEN3="20" DTELMASTER="D" DATATYPE="INT4" LENG="000010" OUTPUTLEN="000010" DECIMALS="000000" SIGNFLAG="X" MASK="  INT4E" MASKLEN="0000" DDTEXT="Natural Number" SCRTEXT_S="Number" SCRTEXT_M="Number" SCRTEXT_L="Natural Number" DOMNAME3L="INT4" DEPTH="00" COMPTYPE="E" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+  <dd03p TABNAME="ZNN_LAYERS_S" FIELDNAME="TYPE" DDLANGUAGE="E" POSITION="0002" ROLLNAME="CHAR1" ADMINFIELD="0" INTTYPE="C" INTLEN="000002" DOMNAME="CHAR1" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="00" SCRLEN2="00" SCRLEN3="00" DTELMASTER="D" DATATYPE="CHAR" LENG="000001" OUTPUTLEN="000001" DECIMALS="000000" MASK="  CHARE" MASKLEN="0000" DDTEXT="Single-Character Indicator" DOMNAME3L="CHAR1" DEPTH="00" COMPTYPE="E" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+  <dd03p TABNAME="ZNN_LAYERS_S" FIELDNAME="NEURONS" DDLANGUAGE="E" POSITION="0003" ROLLNAME="ZNN_NEURONS_T" ADMINFIELD="0" INTLEN="000000" ROUTPUTLEN="000000" HEADLEN="00" SCRLEN1="00" SCRLEN2="00" SCRLEN3="00" DATATYPE="TTYP" LENG="000000" OUTPUTLEN="000000" DECIMALS="000000" MASK="  TTYPL" MASKLEN="0000" DDTEXT="Neurons for layer table type" DEPTH="00" COMPTYPE="L" EXCLASS="0" DBPOSITION="0000" OUTPUTSTYLE="00" STRORLOCPOS="00"/>
+ </TABL>
+ <TTYP TYPENAME="ZNN_PREDECESSORS_T" DDLANGUAGE="E" ROWTYPE="ZNN_PREDECESSORS_S" ROWKIND="S" DATATYPE="STRU" LENG="000000" DECIMALS="000000" ACCESSMODE="T" KEYDEF="D" KEYKIND="N" KEYFDCOUNT="0000" DDTEXT="Predecessors table type" TYPELEN="000028" CTLENG="000000" CTDECIMALS="000000" OCCURS="00000"/>
+ <TTYP TYPENAME="ZNN_LAYERS_T" DDLANGUAGE="E" ROWTYPE="ZNN_LAYERS_S" ROWKIND="S" DATATYPE="STRU" LENG="000000" DECIMALS="000000" ACCESSMODE="T" KEYDEF="D" KEYKIND="N" KEYFDCOUNT="0000" DDTEXT="Layers table type" TYPELEN="000016" CTLENG="000000" CTDECIMALS="000000" OCCURS="00000"/>
+ <TTYP TYPENAME="ZNN_NEURALNET_OUTPUT_T" DDLANGUAGE="E" ROWTYPE="ZNN_AXON_VALUE" ROWKIND="E" DATATYPE="DEC" LENG="000031" DECIMALS="000010" ACCESSMODE="T" KEYDEF="D" KEYKIND="N" KEYFDCOUNT="0000" DDTEXT="Neural Network Output" TYPELEN="000016" CTLENG="000000" CTDECIMALS="000000" OCCURS="00000"/>
+ <TTYP TYPENAME="ZNN_INPUT_DATA_T" DDLANGUAGE="E" ROWTYPE="ZNN_INPUT_DATA_S" ROWKIND="S" DATATYPE="STRU" LENG="000000" DECIMALS="000000" ACCESSMODE="T" KEYDEF="D" KEYKIND="N" KEYFDCOUNT="0000" DDTEXT="Input data for training" TYPELEN="000004" CTLENG="000000" CTDECIMALS="000000" OCCURS="00000"/>
+ <TTYP TYPENAME="ZNN_TRAINING_DATA_T" DDLANGUAGE="E" ROWTYPE="ZNN_TRAINING_DATA_S" ROWKIND="S" DATATYPE="STRU" LENG="000000" DECIMALS="000000" ACCESSMODE="T" KEYDEF="D" KEYKIND="N" KEYFDCOUNT="0000" DDTEXT="Training data structure" TYPELEN="000016" CTLENG="000000" CTDECIMALS="000000" OCCURS="00000"/>
+ <TTYP TYPENAME="ZNN_NEURONS_T" DDLANGUAGE="E" ROWTYPE="ZNN_NEURONS_S" ROWKIND="S" DATATYPE="STRU" LENG="000000" DECIMALS="000000" ACCESSMODE="T" KEYDEF="D" KEYKIND="N" KEYFDCOUNT="0000" DDTEXT="Neurons for layer table type" TYPELEN="000008" CTLENG="000000" CTDECIMALS="000000" OCCURS="00000"/>
+</nugget>
